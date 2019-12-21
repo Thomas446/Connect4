@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/p5@0.10.2/lib/p5.js"></script>
+    <script src="sketch.js"></script>
+	<link rel="stylesheet" href="style.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" >
+
+  </head>
+  <body style="text-align: center;">
+  <button onclick="playAI()">Play vs. the AI!</button>
+  <button onclick="playHuman()">Play vs. a Human!</button>
+  <button id="evalButton" onclick="showEvals()">Show engine evaluation!</button>
+  <button onclick="AIOnly()">Have the AI play itself!</button>
+  <br>
+  <div id="engineHolder" style="display:none; border: 2px solid black;">
+  Engine Evaluations:
+  </div>
+  <br>
+  </body>
+</html>
