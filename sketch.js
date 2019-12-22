@@ -76,7 +76,7 @@ function showEvals(){
 				newState = !newState;
 				
 				for(var i = 0; i < engineEvals.length; i++){
-					evalString += "(" + indexToCoords(engineEvals[i][0])+ "): " + (Math.floor(engineEvals[i][1]*100)/100) + "<br/>";
+					evalString += "Column " + engineEvals[i][0] + ": " + (Math.floor(engineEvals[i][1]*100)/100) + "<br/>";
 				}
 				document.getElementById("engineHolder").innerHTML = evalString;
 				}
@@ -87,8 +87,8 @@ function showEvals(){
 // does the optimal move
 function AIMove(){
 	var move = miniMax(board, player, 0)[0];
-	if(checkValid(board,move)){
-		board = makeMove(board, move,player);
+	if(checkValid(board, columnToIndex(move))){
+		board = makeMove(board, columnToIndex(move),player);
 		player = changeTurn(player);
 		redraw();
 	}	
@@ -101,7 +101,7 @@ function miniMax(tempBoard, currPlayer, layerNum){
 	}else{
 		for(var i = 0; i < 7; i++){
 			if(checkValid(tempBoard, columnToIndex(i))){
-				evals.push([columnToIndex(i), miniMax(makeMove(tempBoard, columnToIndex(i), currPlayer), changeTurn(currPlayer), layerNum + 1)]);
+				evals.push([i, miniMax(makeMove(tempBoard, columnToIndex(i), currPlayer), changeTurn(currPlayer), layerNum + 1)]);
 				
 			}
 			if(layerNum == 1 && i > 1){
@@ -135,6 +135,7 @@ function clearBoard(){
 
 // takes array of [index, eval] pairs and returns best;
 function maximizeForPlayer(currPlayer, evals, layerNum){
+	layerNum = .001;
 	if(currPlayer == 'x'){
 		var best = -.1;
 		var index = 0;
