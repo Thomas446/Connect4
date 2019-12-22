@@ -102,10 +102,11 @@ function miniMax(tempBoard, currPlayer, layerNum){
 		for(var i = 0; i < 7; i++){
 			if(checkValid(tempBoard, columnToIndex(i))){
 				evals.push([columnToIndex(i), miniMax(makeMove(tempBoard, columnToIndex(i), currPlayer), changeTurn(currPlayer), layerNum + 1)]);
-				if(layerNum == 1 && i > 2){
+				
+			}
+			if(layerNum == 1 && i > 1){
 					console.log("no");
 				}
-			}
 		}
 		if(layerNum == 0)
 			engineEvals = evals.slice();
@@ -207,15 +208,15 @@ function evaluateBoard(tempBoard){
 	var horiCount = 0;
 	for(var j = 0; j < 6; j++){
 		for(var i = 0; i < 5; i++){
-			if(winningPlayer == 'z' && board[coordsToIndex(i,j)] != 'z' && board[coordsToIndex(i,j)] == board[coordsToIndex(i+1,j)] && board[coordsToIndex(i,j)] == board[coordsToIndex(i+2,j)] && board[coordsToIndex(i,j)] == board[coordsToIndex(i+3,j)]){
-				winningPlayer = board[coordsToIndex(i,j)];
+			if(winningPlayer == 'z' && tempBoard[coordsToIndex(i,j)] != 'z' && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+1,j)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+2,j)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+3,j)]){
+				winningPlayer = tempBoard[coordsToIndex(i,j)];
 			}
 		}
 	}
 	for(var j = 0; j < 3; j++){
 		for(var i = 0; i < 7; i++){
-			if(winningPlayer == 'z' && board[coordsToIndex(i,j)] != 'z' && board[coordsToIndex(i,j)] == board[coordsToIndex(i,j+1)] && board[coordsToIndex(i,j)] == board[coordsToIndex(i,j+2)] && board[coordsToIndex(i,j)] == board[coordsToIndex(i,j+3)]){
-				winningPlayer = board[coordsToIndex(i,j)];
+			if(winningPlayer == 'z' && tempBoard[coordsToIndex(i,j)] != 'z' && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i,j+1)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i,j+2)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i,j+3)]){
+				winningPlayer = tempBoard[coordsToIndex(i,j)];
 			}
 		}
 	}
