@@ -8,7 +8,7 @@ let newState = false;
 let engineEvals = [];
 var showEvals;
 var onlyAIGame;
-var maxDepth = 12;
+var maxDepth = 10;
 
 
 // creates canvas
