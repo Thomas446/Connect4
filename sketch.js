@@ -1,4 +1,4 @@
-let board = new Array(9);
+let board = new Array(42);
 board.fill('z');
 let player = 'x';
 let gameOver = false;
@@ -8,6 +8,8 @@ let newState = false;
 let engineEvals = [];
 var showEvals;
 var onlyAIGame;
+
+
 
 // creates canvas
 function setup(){
@@ -22,6 +24,7 @@ function setup(){
 	cnv.position(displayWidth/2 - (width/2), displayHeight/2 + offset - (height/2));
 	noLoop();
 }
+
 // draws
 function draw(){	
 	clear();
@@ -96,9 +99,12 @@ function miniMax(tempBoard, currPlayer, layerNum){
 	if(boardFilled(tempBoard) || evaluateBoard(tempBoard) != 0){
 		return evaluateBoard(tempBoard);
 	}else{
-		for(var i = 0; i < tempBoard.length; i++){
-			if(checkValid(tempBoard,i)){
-				evals.push([i, miniMax(makeMove(tempBoard, i, currPlayer), changeTurn(currPlayer), layerNum + 1)]);
+		for(var i = 0; i < 7; i++){
+			if(checkValid(tempBoard, columnToIndex(i))){
+				evals.push([columnToIndex(i), miniMax(makeMove(tempBoard, columnToIndex(i), currPlayer), changeTurn(currPlayer), layerNum + 1)]);
+				if(layerNum == 1 && i > 2){
+					console.log("no");
+				}
 			}
 		}
 		if(layerNum == 0)
@@ -108,6 +114,17 @@ function miniMax(tempBoard, currPlayer, layerNum){
 			
 	}
 }
+
+//takes a column and makes it into an array index
+function columnToIndex(col){
+	for(var i = 5; i >= 0; i--){
+		if(board[coordsToIndex(col, i)] == 'z'){
+			return coordsToIndex(col, i);
+		}
+	}
+	return -1;
+}
+
 function clearBoard(){
 	board.fill('z');
 	player = 'x';
@@ -167,12 +184,11 @@ function maximizeForPlayer(currPlayer, evals, layerNum){
 
 // click handler
 function touchStarted(){
-	for(var i = 0; i < board.length; i++){
-		var centerX = (width/3)*(.5 + indexToCoords(i)[0]);
-		var centerY = (height/3)*(.5 + indexToCoords(i)[1]);
-		if(mouseX  < centerX + (width/6) * .9 && mouseX > centerX < (width/6) * .9  && mouseY < centerY + (height/6) * .9  && mouseY > centerY - (height/6) * .9  && !disableClicking){
-			if(checkValid(board, i, player)){
-			board = makeMove(board, i, player);
+	for(var i = 0; i < 7; i++){
+		var centerX = i*(width/7) + width/14;
+		if((mouseX  < centerX + (width/14) * .95) && mouseX > (centerX - (width/14) * .95) && mouseY > 0 && mouseY < height && !disableClicking){
+			if(checkValid(board, columnToIndex(i), player)){
+			board = makeMove(board, columnToIndex(i), player);
 			player = changeTurn(player);
 			redraw();
 			if(AIGame){
@@ -188,24 +204,22 @@ function touchStarted(){
 // checks if someone has won (board is filled with z by default)
 function evaluateBoard(tempBoard){
 	var winningPlayer = 'z';
-	for(var i = 0; i < tempBoard.length/3; i++){
-		if(tempBoard[coordsToIndex(0,i)] == tempBoard[coordsToIndex(1,i)] && tempBoard[coordsToIndex(0,i)] == tempBoard[coordsToIndex(2,i)] && winningPlayer == 'z'){
-			winningPlayer = tempBoard[coordsToIndex(0,i)];
+	var horiCount = 0;
+	for(var j = 0; j < 6; j++){
+		for(var i = 0; i < 5; i++){
+			if(winningPlayer == 'z' && board[coordsToIndex(i,j)] != 'z' && board[coordsToIndex(i,j)] == board[coordsToIndex(i+1,j)] && board[coordsToIndex(i,j)] == board[coordsToIndex(i+2,j)] && board[coordsToIndex(i,j)] == board[coordsToIndex(i+3,j)]){
+				winningPlayer = board[coordsToIndex(i,j)];
+			}
+		}
+	}
+	for(var j = 0; j < 3; j++){
+		for(var i = 0; i < 7; i++){
+			if(winningPlayer == 'z' && board[coordsToIndex(i,j)] != 'z' && board[coordsToIndex(i,j)] == board[coordsToIndex(i,j+1)] && board[coordsToIndex(i,j)] == board[coordsToIndex(i,j+2)] && board[coordsToIndex(i,j)] == board[coordsToIndex(i,j+3)]){
+				winningPlayer = board[coordsToIndex(i,j)];
+			}
 		}
 	}
 	
-	for(var i = 0; i < tempBoard.length/3; i++){
-		if(tempBoard[coordsToIndex(i,0)] == tempBoard[coordsToIndex(i,1)] && tempBoard[coordsToIndex(i,0)] == tempBoard[coordsToIndex(i,2)] && winningPlayer == 'z'){
-			winningPlayer = tempBoard[coordsToIndex(i,0)];
-		}
-	}
-	
-	if(tempBoard[0] == tempBoard[4] && tempBoard[0] == tempBoard[8] && winningPlayer == 'z'){
-		winningPlayer = tempBoard[4];
-	}
-	if(tempBoard[2] == tempBoard[4] && tempBoard[2] == tempBoard[6] && winningPlayer == 'z'){
-		winningPlayer = tempBoard[4];
-	}
 	if(winningPlayer == 'o')
 		return -1;
 	else if(winningPlayer == 'x')
@@ -227,7 +241,7 @@ function boardFilled(tempBoard){
 }
 // turns x y coordinates into an index
 function coordsToIndex(x, y){
-	return y*3 + x;
+	return y*7 + x;
 }
 
 // returns the player for the next turn
@@ -239,7 +253,7 @@ function changeTurn(currPlayer){
 }
 // turns an index into x,y coordinates
 function indexToCoords(index){
-	return [index%3, Math.floor(index/3)];
+	return [index%7, Math.floor(index/7)];
 }
 
 // returns a board with the move by player at index
@@ -251,6 +265,8 @@ function makeMove(tempBoard, index, currPlayer){
 
 //checks if moving at index would be valid
 function checkValid(tempBoard, index){
+	if(index == -1)
+		return false;
 	if(tempBoard[index] != 'o' && tempBoard[index] != 'x' && !gameOver)
 		return true;
 	return false;
@@ -260,31 +276,37 @@ function checkValid(tempBoard, index){
 function drawBoard(tempBoard){
 	fill(0,0,255);
 	rect(0,0,width,height);
+	fill(255,255,255);
+	for(var j = 0; j < 6; j++){
+		for(var i = 0; i < 7; i++){
+			circle(i*width/7 + width/14,j*height/6 + height/12, height/6);
+		}
+	}
 	
 	for(var i = 0; i < tempBoard.length; i++){
 		if(tempBoard[i] == 'x'){
-			drawX(i);
+			drawRed(i);
 		}else if(tempBoard[i] == 'o'){
-			drawO(i);
+			drawYellow(i);
 		}
 	}
 	
 }
-// draws Xs
-function drawX(index){
+// draws red
+function drawRed(index){
 	var centerX;
 	var centerY;
-	
-	centerX = (width/3)*(.5 + indexToCoords(index)[0]);
-	centerY = (height/3)*(.5 + indexToCoords(index)[1]);
-	line(centerX - (width/6) * .75, centerY - (height/6) * .75, centerX + (width/6) * .75, centerY + (height/6) * .75);
-	line(centerX + (width/6) * .75, centerY - (height/6) * .75, centerX - (width/6) * .75, centerY + (height/6) * .75);
+	centerX = indexToCoords(index)[0]*(width/7) + width/14;
+	centerY = indexToCoords(index)[1]*height/6 + height/12;
+	fill(255,0,0);
+	circle(centerX,centerY, height/6);
 }
-// draws Os
-function drawO(index){
+// draws yellow
+function drawYellow(index){
 	var centerX;
 	var centerY;
-	centerX = (width/3)*(.5 + indexToCoords(index)[0]);
-	centerY = (height/3)*(.5 + indexToCoords(index)[1]);
-	circle(centerX,centerY, (height/3) * .75);
+	centerX = indexToCoords(index)[0]*(width/7) + width/14;
+	centerY = indexToCoords(index)[1]*height/6 + height/12;
+	fill(255,255,0);
+	circle(centerX,centerY, height/6);
 }
