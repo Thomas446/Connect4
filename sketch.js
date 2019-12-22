@@ -8,7 +8,7 @@ let newState = false;
 let engineEvals = [];
 var showEvals;
 var onlyAIGame;
-
+var maxDepth = 12;
 
 
 // creates canvas
@@ -60,6 +60,9 @@ function AIOnly(){
 			clearInterval(onlyAIGame);
 	}, 1000);
 }
+function changeDepth(){
+	maxDepth = parseInt(prompt("Type the depth that you want the AI to search (over 10 not recommended)"));
+}
 
 function showEvals(){
 	if(document.getElementById("engineHolder").style.display == "inline-block"){
@@ -72,7 +75,7 @@ function showEvals(){
 			if(newState){
 				var evalString = "Engine Evaluations: <br/>";
 				document.getElementById("engineHolder").style.display = "inline-block";
-				miniMax(board, player, 0);
+				miniMax(board, player, 0, -2 ,2);
 				newState = !newState;
 				
 				for(var i = 0; i < engineEvals.length; i++){
@@ -86,40 +89,72 @@ function showEvals(){
 }
 // does the optimal move
 function AIMove(){
-	var move = miniMax(board, player, 0)[0];
-	if(checkValid(board, columnToIndex(move))){
-		board = makeMove(board, columnToIndex(move),player);
+	var move = miniMax(board, player, 0, -2, 2)[0];
+	if(checkValid(board, columnToIndex(move, board))){
+		board = makeMove(board, columnToIndex(move, board),player);
 		player = changeTurn(player);
 		redraw();
 	}	
 }
-// recursively evaluates the position (doesn't make a move yet)
-function miniMax(tempBoard, currPlayer, layerNum){
+// recursively evaluates the position
+function miniMax(tempBoard, currPlayer, layerNum, alpha, beta){
+	var temp;
+	if(layerNum > maxDepth + 7 - columnsLeft(board))
+		return 0;
 	var evals = [];
 	if(boardFilled(tempBoard) || evaluateBoard(tempBoard) != 0){
 		return evaluateBoard(tempBoard);
 	}else{
 		for(var i = 0; i < 7; i++){
-			if(checkValid(tempBoard, columnToIndex(i))){
-				evals.push([i, miniMax(makeMove(tempBoard, columnToIndex(i), currPlayer), changeTurn(currPlayer), layerNum + 1)]);
+			
+			if(checkValid(tempBoard, columnToIndex(i, tempBoard))){
 				
-			}
-			if(layerNum == 1 && i > 1){
-					console.log("no");
+				temp = miniMax(makeMove(tempBoard, columnToIndex(i, tempBoard), currPlayer), changeTurn(currPlayer), layerNum + 1, alpha, beta)
+				evals.push([i, temp]);					
+				if(currPlayer == 'x'){
+					if(alpha < temp){
+						alpha = temp;
+					}
+					if(beta <= alpha){
+						break;
+					}
+				}else{
+					if(beta > temp){
+						beta = temp;
+					}
+					if(beta <= alpha){
+						break;
+					}
 				}
+				}
+			}
 		}
+		
 		if(layerNum == 0)
 			engineEvals = evals.slice();
 		
 		return maximizeForPlayer(currPlayer, evals, layerNum);
 			
 	}
+
+function playerToSign(currPlayer){
+	if(currPlayer == 'x')
+		return 1;
+	return -1;
+}
+function columnsLeft(tempBoard){
+	var count = 0;
+	for(var i = 0; i < 7; i++){
+		if(columnToIndex(i, tempBoard) != -1)
+			count++;
+	}
+	return count;
 }
 
 //takes a column and makes it into an array index
-function columnToIndex(col){
+function columnToIndex(col, tempBoard){
 	for(var i = 5; i >= 0; i--){
-		if(board[coordsToIndex(col, i)] == 'z'){
+		if(tempBoard[coordsToIndex(col, i)] == 'z'){
 			return coordsToIndex(col, i);
 		}
 	}
@@ -135,9 +170,8 @@ function clearBoard(){
 
 // takes array of [index, eval] pairs and returns best;
 function maximizeForPlayer(currPlayer, evals, layerNum){
-	layerNum = .001;
-	if(currPlayer == 'x'){
-		var best = -.1;
+		if(currPlayer == 'x'){
+		var best = -1;
 		var index = 0;
 		
 		// choose best move, winning faster incentivized by layerNum
@@ -189,8 +223,8 @@ function touchStarted(){
 	for(var i = 0; i < 7; i++){
 		var centerX = i*(width/7) + width/14;
 		if((mouseX  < centerX + (width/14) * .95) && mouseX > (centerX - (width/14) * .95) && mouseY > 0 && mouseY < height && !disableClicking){
-			if(checkValid(board, columnToIndex(i), player)){
-			board = makeMove(board, columnToIndex(i), player);
+			if(checkValid(board, columnToIndex(i, board), player)){
+			board = makeMove(board, columnToIndex(i, board), player);
 			player = changeTurn(player);
 			redraw();
 			if(AIGame){
@@ -219,8 +253,19 @@ function evaluateBoard(tempBoard){
 			if(winningPlayer == 'z' && tempBoard[coordsToIndex(i,j)] != 'z' && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i,j+1)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i,j+2)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i,j+3)]){
 				winningPlayer = tempBoard[coordsToIndex(i,j)];
 			}
+			if(i > 2){
+				if(tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i-1,j+1)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i-2,j+2)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i-3,j + 3)] && winningPlayer == 'z' && tempBoard[coordsToIndex(i,j)] != 'z'){
+				winningPlayer = tempBoard[coordsToIndex(i,j)];
+				}
+			}
+			if(i < 4){
+				if(tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+1,j+1)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+2,j+2)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+3,j + 3)] && winningPlayer == 'z' && tempBoard[coordsToIndex(i,j)] != 'z'){
+				winningPlayer = tempBoard[coordsToIndex(i,j)];
+			}
+			}
 		}
 	}
+	
 	
 	if(winningPlayer == 'o')
 		return -1;
