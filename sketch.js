@@ -40,16 +40,19 @@ function draw(){
 		gameOver = true;
 	}
 }
+// starts human vs AI game
 function playAI(){
 	clearBoard();
 	disableClicking = false;
 	AIGame = true;
 }
+// starts human vs human game
 function playHuman(){
 	clearBoard();
 	disableClicking = false;
 	AIGame = false;
 }
+// starts AI game
 function AIOnly(){
 	clearBoard();
 	disableClicking = true;
@@ -60,10 +63,12 @@ function AIOnly(){
 			clearInterval(onlyAIGame);
 	}, 1000);
 }
+// prompts user to change engine depth
 function changeDepth(){
 	maxDepth = parseInt(prompt("Type the depth that you want the AI to search (over 10 not recommended)"));
 }
 
+// displays engine evaluations on screen
 function showEvals(){
 	if(document.getElementById("engineHolder").style.display == "inline-block"){
 		clearInterval(showingEvals);
@@ -98,7 +103,13 @@ function AIMove(){
 }
 // recursively evaluates the position
 function miniMax(tempBoard, currPlayer, layerNum, alpha, beta){
+	var value;
+	if(currPlayer == 'x')
+		value = -2;
+	else
+		value = 2;
 	var temp;
+	
 	if(layerNum > maxDepth + 7 - columnsLeft(board))
 		return 0;
 	var evals = [];
@@ -106,21 +117,26 @@ function miniMax(tempBoard, currPlayer, layerNum, alpha, beta){
 		return evaluateBoard(tempBoard);
 	}else{
 		for(var i = 0; i < 7; i++){
-			
 			if(checkValid(tempBoard, columnToIndex(i, tempBoard))){
 				
-				temp = miniMax(makeMove(tempBoard, columnToIndex(i, tempBoard), currPlayer), changeTurn(currPlayer), layerNum + 1, alpha, beta)
-				evals.push([i, temp]);					
+				temp = miniMax(makeMove(tempBoard, columnToIndex(i, tempBoard), currPlayer), changeTurn(currPlayer), layerNum + 1, alpha, beta);
+				
 				if(currPlayer == 'x'){
-					if(alpha < temp){
-						alpha = temp;
+					if(value < temp)
+						value = temp;
+					evals.push([i, temp]);	
+					if(alpha < value){
+						alpha = value;
 					}
 					if(beta <= alpha){
 						break;
 					}
 				}else{
-					if(beta > temp){
-						beta = temp;
+					if(value > temp)
+						value = temp;
+					evals.push([i, temp]);	
+					if(beta > value){
+						beta = value;
 					}
 					if(beta <= alpha){
 						break;
@@ -142,6 +158,7 @@ function playerToSign(currPlayer){
 		return 1;
 	return -1;
 }
+// returns number of non-filled columns
 function columnsLeft(tempBoard){
 	var count = 0;
 	for(var i = 0; i < 7; i++){
@@ -161,6 +178,7 @@ function columnToIndex(col, tempBoard){
 	return -1;
 }
 
+//clears board
 function clearBoard(){
 	board.fill('z');
 	player = 'x';
