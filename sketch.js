@@ -8,7 +8,7 @@ let newState = false;
 let engineEvals = [];
 var showEvals;
 var onlyAIGame;
-var maxDepth = 10;
+var maxDepth = 7;
 
 
 // creates canvas
@@ -65,7 +65,7 @@ function AIOnly(){
 }
 // prompts user to change engine depth
 function changeDepth(){
-	maxDepth = parseInt(prompt("Type the depth that you want the AI to search (over 10 not recommended)"));
+	maxDepth = parseInt(prompt("Type the depth that you want the AI to search (over 7 not recommended)"));
 }
 
 // displays engine evaluations on screen
@@ -103,42 +103,39 @@ function AIMove(){
 }
 // recursively evaluates the position
 function miniMax(tempBoard, currPlayer, layerNum, alpha, beta){
-	var value;
-	if(currPlayer == 'x')
-		value = -2;
-	else
-		value = 2;
 	var temp;
 	
 	if(layerNum > maxDepth + 7 - columnsLeft(board))
 		return 0;
 	var evals = [];
-	if(boardFilled(tempBoard) || evaluateBoard(tempBoard) != 0){
-		return evaluateBoard(tempBoard);
+	var currEvaluation = evaluateBoard(tempBoard);
+	if(boardFilled(tempBoard) || currEvaluation != 0){
+		return currEvaluation;
 	}else{
 		for(var i = 0; i < 7; i++){
 			if(checkValid(tempBoard, columnToIndex(i, tempBoard))){
-				
+				if(layerNum == 0)
+					console.log("Top layer");
 				temp = miniMax(makeMove(tempBoard, columnToIndex(i, tempBoard), currPlayer), changeTurn(currPlayer), layerNum + 1, alpha, beta);
 				
+				
 				if(currPlayer == 'x'){
-					if(value < temp)
-						value = temp;
+					temp -= layerNum*.01;
 					evals.push([i, temp]);	
-					if(alpha < value){
-						alpha = value;
+					
+					if(alpha < temp){
+						alpha = temp;
 					}
-					if(beta <= alpha){
+					if(beta < alpha){
 						break;
 					}
 				}else{
-					if(value > temp)
-						value = temp;
+					temp += layerNum*.01;
 					evals.push([i, temp]);	
-					if(beta > value){
-						beta = value;
+					if(beta > temp){
+						beta = temp;
 					}
-					if(beta <= alpha){
+					if(beta < alpha){
 						break;
 					}
 				}
@@ -189,46 +186,32 @@ function clearBoard(){
 // takes array of [index, eval] pairs and returns best;
 function maximizeForPlayer(currPlayer, evals, layerNum){
 		if(currPlayer == 'x'){
-		var best = -1;
+		var best = -2;
 		var index = 0;
 		
 		// choose best move, winning faster incentivized by layerNum
 		for(var i = 0; i < evals.length; i++){
 			if(evals[i][1] > best){
-				best = evals[i][1] - layerNum*.01;
+				best = evals[i][1];
+				index = i;
+			}else if(evals[i][1] == best && Math.random() < .5){
 				index = i;
 			}
 		}
-		// If guaranteed to lose, make lasting longer worth more
-		if(best < -.9){
-			for(var i = 0; i < evals.length; i++){
-			    if(evals[i][1] < best){
-					best = evals[i][1] + layerNum*.01;
-					index = i;
-			}
-		}
-		}
+		
 	}else if(currPlayer == 'o'){
-		var best = 1;
+		var best = 2;
 		var index = 0;
 		
-		// choose best move, winning faster incentivized by layerNum
 		for(var i = 0; i < evals.length; i++){
 			if(evals[i][1] < best){
-				best = evals[i][1] + layerNum*.01;
+				best = evals[i][1];
+				index = i;
+			}else if(evals[i][1] == best && Math.random() < .5){
 				index = i;
 			}
 		}
 		
-		// If guaranteed to lose, make lasting longer worth more
-		if(best > .9){
-			for(var i = 0; i < evals.length; i++){
-			    if(evals[i][1] < best){
-					best = evals[i][1] - layerNum*.01;
-					index = i;
-			}
-		}
-		}
 	}
 	if(layerNum == 0)
 		return evals[index];
