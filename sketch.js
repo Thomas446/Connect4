@@ -11,6 +11,7 @@ var onlyAIGame;
 var maxDepth = 7;
 
 
+
 // creates canvas
 function setup(){
 	if(displayWidth < displayHeight){
@@ -241,26 +242,25 @@ function touchStarted(){
 // checks if someone has won (board is filled with z by default)
 function evaluateBoard(tempBoard){
 	var winningPlayer = 'z';
-	var horiCount = 0;
 	for(var j = 0; j < 6; j++){
-		for(var i = 0; i < 5; i++){
+		for(var i = 0; i < 3; i++){
 			if(winningPlayer == 'z' && tempBoard[coordsToIndex(i,j)] != 'z' && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+1,j)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+2,j)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+3,j)]){
 				winningPlayer = tempBoard[coordsToIndex(i,j)];
 			}
 		}
 	}
-	for(var j = 0; j < 3; j++){
+	for(var j = 0; j < 2; j++){
 		for(var i = 0; i < 7; i++){
 			if(winningPlayer == 'z' && tempBoard[coordsToIndex(i,j)] != 'z' && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i,j+1)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i,j+2)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i,j+3)]){
 				winningPlayer = tempBoard[coordsToIndex(i,j)];
 			}
 			if(i > 2){
-				if(tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i-1,j+1)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i-2,j+2)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i-3,j + 3)] && winningPlayer == 'z' && tempBoard[coordsToIndex(i,j)] != 'z'){
+				if(winningPlayer == 'z' && tempBoard[coordsToIndex(i,j)] != 'z' && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i-1,j+1)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i-2,j+2)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i-3,j + 3)] && winningPlayer == 'z' && tempBoard[coordsToIndex(i,j)] != 'z'){
 				winningPlayer = tempBoard[coordsToIndex(i,j)];
 				}
 			}
 			if(i < 4){
-				if(tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+1,j+1)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+2,j+2)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+3,j + 3)] && winningPlayer == 'z' && tempBoard[coordsToIndex(i,j)] != 'z'){
+				if(winningPlayer == 'z' && tempBoard[coordsToIndex(i,j)] != 'z' && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+1,j+1)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+2,j+2)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+3,j + 3)] && winningPlayer == 'z' && tempBoard[coordsToIndex(i,j)] != 'z'){
 				winningPlayer = tempBoard[coordsToIndex(i,j)];
 			}
 			}
@@ -289,6 +289,8 @@ function boardFilled(tempBoard){
 }
 // turns x y coordinates into an index
 function coordsToIndex(x, y){
+	if(x > 6 || y > 5)
+		console.log("coordsToIndex: coords out of bounds");
 	return y*7 + x;
 }
 
