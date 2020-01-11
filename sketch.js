@@ -243,13 +243,13 @@ function touchStarted(){
 function evaluateBoard(tempBoard){
 	var winningPlayer = 'z';
 	for(var j = 0; j < 6; j++){
-		for(var i = 0; i < 3; i++){
+		for(var i = 0; i < 4; i++){
 			if(winningPlayer == 'z' && tempBoard[coordsToIndex(i,j)] != 'z' && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+1,j)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+2,j)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i+3,j)]){
 				winningPlayer = tempBoard[coordsToIndex(i,j)];
 			}
 		}
 	}
-	for(var j = 0; j < 2; j++){
+	for(var j = 0; j < 3; j++){
 		for(var i = 0; i < 7; i++){
 			if(winningPlayer == 'z' && tempBoard[coordsToIndex(i,j)] != 'z' && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i,j+1)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i,j+2)] && tempBoard[coordsToIndex(i,j)] == tempBoard[coordsToIndex(i,j+3)]){
 				winningPlayer = tempBoard[coordsToIndex(i,j)];
