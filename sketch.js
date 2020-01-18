@@ -289,6 +289,14 @@ function evaluateBoard(tempBoard){
 		return 0;
 		
 }
+
+function playerToNum(character){
+	if(character == 'x')
+		return 1;
+	if(character == 'o')
+		return -1;
+	return 0
+}
 // checks for a tie
 function boardFilled(tempBoard){
 	var filled = true;
@@ -302,8 +310,10 @@ function boardFilled(tempBoard){
 }
 // turns x y coordinates into an index
 function coordsToIndex(x, y){
-	if(x > 6 || y > 5)
+	if(x > 6 || y > 5){
 		console.log("coordsToIndex: coords out of bounds");
+		return -1;
+	}
 	return y*7 + x;
 }
 
