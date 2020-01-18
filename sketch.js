@@ -9,7 +9,7 @@ let engineEvals = [];
 var showEvals;
 var onlyAIGame;
 var maxDepth = 7;
-
+var stopGame = false;
 
 
 // creates canvas
@@ -42,13 +42,24 @@ function draw(){
 	}
 }
 // starts human vs AI game
-function playAI(){
+function playAISecond(){
+	stopGame = true;
+	clearBoard();
+	disableClicking = true;
+	AIGame = true;
+	AIMove();
+	disableClicking = false;
+}
+
+function playAIFirst(){
+	stopGame = true;
 	clearBoard();
 	disableClicking = false;
 	AIGame = true;
 }
 // starts human vs human game
 function playHuman(){
+	stopGame = true;
 	clearBoard();
 	disableClicking = false;
 	AIGame = false;
@@ -57,11 +68,13 @@ function playHuman(){
 function AIOnly(){
 	clearBoard();
 	disableClicking = true;
+	stopGame = false;
 	AIGame = false;
 	onlyAIGame = setInterval(function(){
-		AIMove();
-		if(gameOver || boardFilled(board))
+		if(gameOver || boardFilled(board) || stopGame)
 			clearInterval(onlyAIGame);
+		else
+			AIMove();
 	}, 1000);
 }
 // prompts user to change engine depth
