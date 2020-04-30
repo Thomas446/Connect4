@@ -121,7 +121,7 @@ function miniMax(tempBoard, currPlayer, layerNum, alpha, beta){
 	var temp;
 	
 	if(layerNum > maxDepth + 7 - columnsLeft(board))
-		return 0;
+		return heuristic(tempBoard);
 	var evals = [];
 	var currEvaluation = evaluateBoard(tempBoard);
 	if(boardFilled(tempBoard) || currEvaluation != 0){
@@ -281,7 +281,7 @@ function evaluateBoard(tempBoard){
 		}
 	}
 	
-	
+
 	if(winningPlayer == 'o')
 		return -1;
 	else if(winningPlayer == 'x')
@@ -289,6 +289,10 @@ function evaluateBoard(tempBoard){
 	else
 		return 0;
 		
+}
+//Temporary, will do in the future, AI plays pretty well without this somehow
+function heuristic(tempBoard){
+	return 0;
 }
 
 function playerToNum(character){
