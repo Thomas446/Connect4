@@ -5,4 +5,4 @@ To play, you must click one of the button options (e.g. play vs. AI or play vs. 
 
 Since connect 4 is a pretty complex game, alpha beta pruning is used to reduce the time complexity.
 
-Test it at [tsuff446.github.io/Connect4](tsuff446.github.io/Connect4)
+Test it at [https://tsuff446.github.io/Connect4/](https://tsuff446.github.io/Connect4/)
